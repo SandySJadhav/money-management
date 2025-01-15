@@ -35,12 +35,10 @@ export default function BigCalendar() {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    generateCalendar(new Date());
-  }, []);
+    generateCalendar(currentDate);
+  }, [currentDate]);
 
   const generateCalendar = (myDate) => {
-    setCurrentDate(currentDate);
-
     const year = myDate.getFullYear();
     const month = myDate.getMonth();
 
@@ -50,16 +48,17 @@ export default function BigCalendar() {
     const lastDateOfMonth = new Date(year, month + 1, 0).getDate();
     // get last day of month
     const lastDayOfMonth = new Date(year, month, lastDateOfMonth).getDay();
-    // get last date of month
+    // get last date of previous month
     const lastDateOfLastMonth = new Date(year, month, 0).getDate();
 
-    // capture previous month dates
     const currentMonthDates = [];
+
+    // capture previous month dates
     for (let index = firstDayOfMonth; index > 0; index--) {
       currentMonthDates.push({
         date: lastDateOfLastMonth - index + 1,
-        month: MonthList[month - 1],
-        year,
+        month: MonthList[(month - 1 + 12) % 12],
+        year: month === 0 ? year - 1 : year,
         classes: "text-gray-400"
       });
     }
@@ -75,28 +74,26 @@ export default function BigCalendar() {
         classes: dateToday.getFullYear() === year && dateToday.getMonth() === month && dateToday.getDate() === index ? "!bg-blue-400 !text-white" : ""
       });
     }
+
     // capture next month dates
-    for (let index = lastDayOfMonth; index < 6; index++) {
+    for (let index = 1; currentMonthDates.length < 42; index++) {
       currentMonthDates.push({
-        date: index - lastDayOfMonth + 1,
-        month: MonthList[month + 1],
-        year,
+        date: index,
+        month: MonthList[(month + 1) % 12],
+        year: month === 11 ? year + 1 : year,
         classes: "text-gray-400"
       });
     }
+
     setDatesInMonth(currentMonthDates);
   }
 
   const handleSetPrevMonth = () => {
-    const currMonth = currentDate.getMonth();
-    currentDate.setMonth(currMonth - 1)
-    generateCalendar(currentDate);
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
   }
 
   const handleSetNextMonth = () => {
-    const currMonth = currentDate.getMonth();
-    currentDate.setMonth(currMonth + 1)
-    generateCalendar(currentDate);
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   }
 
   const handleDateClick = () => {
@@ -114,7 +111,7 @@ export default function BigCalendar() {
           <button onClick={handleSetPrevMonth} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 dark:focus-visible:ring-gray-300">
             <ChevronLeftIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
-          <button className="p-2">
+          <button className="p-2 hover:bg-gray-100" onClick={() => setCurrentDate(new Date())}>
             Today
           </button>
           <button onClick={handleSetNextMonth} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 dark:focus-visible:ring-gray-300">
