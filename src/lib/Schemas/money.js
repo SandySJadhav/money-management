@@ -1,24 +1,48 @@
 import mongoose from "mongoose";
 
 const moneySchema = new mongoose.Schema({
-  income: {
+  account: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Account',
+    required: true
+  },
+  type: {
+    type: String,
+    required: true
+  },
+  amount: {
     type: Number,
     required: true
   },
-  expenses: {
-    type: Number,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
-  },
-  savings: {
-    type: Number,
-    required: true
-  },
-  lastUpdatedAt: {
-    type: Date,
   },
   createdAt: {
-    type: Date,
-  }
+    type: Number,
+    default: () => Math.floor(Date.now() / 1000),
+    immutable: true
+  },
+  lastUpdatedAt: {
+    type: Number,
+    default: () => Math.floor(Date.now() / 1000)
+  },
+});
+
+moneySchema.pre('save', function(next) {
+  this.lastUpdatedAt = Math.floor(Date.now() / 1000);
+  next();
+});
+
+moneySchema.pre('findOneAndUpdate', function(next) {
+  this.set({ lastUpdatedAt: Math.floor(Date.now() / 1000) });
+  next();
+});
+
+moneySchema.pre('updateOne', function(next) {
+  this.set({ lastUpdatedAt: Math.floor(Date.now() / 1000) });
+  next();
 });
 
 const Money = mongoose.model('Money', moneySchema);
