@@ -1,9 +1,26 @@
 import mongoose from "mongoose";
 
-const moneyModel = new mongoose.Schema({
-  startsAt: Date,
-  endsAt: Date,
-  createdAt: Date,
-})
+const moneySchema = new mongoose.Schema({
+  income: {
+    type: Number,
+    required: true
+  },
+  expenses: {
+    type: Number,
+    required: true
+  },
+  savings: {
+    type: Number,
+    required: true
+  },
+  lastUpdatedAt: {
+    type: Date,
+  },
+  createdAt: {
+    type: Date,
+  }
+});
 
-export const CalendarEvent = mongoose.model.Money || mongoose.model("Money", moneyModel)
+const Money = mongoose.model('Money', moneySchema);
+
+export default Money;
