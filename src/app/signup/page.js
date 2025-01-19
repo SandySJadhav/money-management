@@ -5,12 +5,14 @@ import { Button, Flex, Form, FormControl, Spinner, TextInput } from "@contentful
 import Link from "next/link";
 import { postData } from "@/lib/http.interceptor";
 import { useRouter } from "next/navigation";
+import { DoneIcon } from "@contentful/f36-icons";
+
+const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,12}$/;
 
 const Login = () => {
   const [userName, setUserName] = useState({ value: "", isValid: false, error: "Required" });
   const [password, setPassword] = useState({ value: "", isValid: false, error: "Required" });
   const [confirmPassword, setConfirmPassword] = useState({ value: "", isValid: false, error: "Required" });
-  const [age, setAge] = useState({ value: 0, isValid: false, error: "Required" });
   const [firstName, setFirstName] = useState({ value: "", isValid: false, error: "Required" });
   const [lastName, setLastName] = useState({ value: "", isValid: false, error: "Required" });
   const [success, setSuccess] = useState(false);
@@ -18,43 +20,47 @@ const Login = () => {
   const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
 
+  const handleSubmitResponse = ({ status, error }) => {
+    if (status === 200) {
+      setSuccess(true);
+      setTimeout(() => {
+        router.push("/login");
+      }, 1000);
+    } else {
+      setSuccess(false);
+      if (status === 409) {
+        setUserName({
+          isValid: false,
+          error,
+        });
+      } else {
+        setConfirmPassword({
+          isValid: false,
+          error,
+        });
+      }
+    }
+  }
+
   const submitForm = async () => {
     setSubmitted(true);
     setIsLoading(true);
-    if (userName.isValid && password.isValid && confirmPassword.isValid && age.isValid && firstName.isValid && lastName.isValid) {
+    if (
+      userName.isValid &&
+      password.isValid &&
+      confirmPassword.isValid &&
+      firstName.isValid &&
+      lastName.isValid
+    ) {
       const res = await postData("/signup", {
         userName: userName.value,
         password: password.value,
         confirmPassword: confirmPassword.value,
-        age: age.value,
         firstName: firstName.value,
         lastName: lastName.value
       });
       console.log("Response", res);
-      if (res.status === 200) {
-        setSuccess(true);
-        setTimeout(() => {
-          router.push("/");
-        }, 1500);
-      } else {
-        setSuccess(false);
-        if (res.status === 401) {
-          setPassword({
-            isValid: false,
-            error: "Wrong password!",
-          });
-        } else if (res.status === 404) {
-          setUserName({
-            isValid: false,
-            error: "Username does not exist!",
-          });
-        } else {
-          setPassword({
-            isValid: false,
-            error: "Internal Server Error!",
-          });
-        }
-      }
+      handleSubmitResponse(res);
       setIsLoading(false);
     } else {
       setIsLoading(false);
@@ -62,51 +68,54 @@ const Login = () => {
   };
 
   const onChangeUserName = (e) => {
+    const { value } = e.target;
     setUserName({
-      value: e.target.value,
-      isValid: e.target.value.length > 0,
-      error: e.target.value.length > 0 ? "" : "Required",
+      value,
+      isValid: value.length > 0,
+      error: value.length > 0 ? "" : "Required",
     });
   }
 
   const onChangeFirstName = (e) => {
+    const { value } = e.target;
     setFirstName({
-      value: e.target.value,
-      isValid: e.target.value.length > 0,
-      error: e.target.value.length > 0 ? "" : "Required",
+      value,
+      isValid: value.length > 0,
+      error: value.length > 0 ? "" : "Required",
     });
   }
 
   const onChangeLastName = (e) => {
+    const { value } = e.target;
     setLastName({
-      value: e.target.value,
-      isValid: e.target.value.length > 0,
-      error: e.target.value.length > 0 ? "" : "Required",
+      value,
+      isValid: value.length > 0,
+      error: value.length > 0 ? "" : "Required",
     });
   }
 
   const onChangePassword = (e) => {
+    const { value } = e.target;
     setPassword({
-      value: e.target.value,
-      isValid: e.target.value.length > 0,
-      error: e.target.value.length > 0 ? "" : "Required",
-    })
+      value,
+      isValid: passwordRegex.test(value),
+      error: value.length > 0 ? passwordRegex.test(value) ? "" : "Password must be 4-12 characters long and include at least one letter and one number" : "Required",
+    });
+    if (confirmPassword.value.length > 0) {
+      setConfirmPassword({
+        value: confirmPassword.value,
+        isValid: value === confirmPassword.value,
+        error: value === confirmPassword.value ? "" : "Password & Confirm password should match!",
+      });
+    }
   }
 
   const onChangeConfirmPassword = (e) => {
+    const { value } = e.target;
     setConfirmPassword({
-      value: e.target.value,
-      isValid: e.target.value.length > 0,
-      error: e.target.value.length > 0 ? "" : "Required",
-    })
-  }
-
-  const onChangeAge = (e) => {
-    console.log(e.target.value);
-    setAge({
-      value: e.target.value,
-      isValid: e.target.value.length > 0,
-      error: e.target.value.length > 0 ? "" : "Required",
+      value,
+      isValid: value.length > 0 && value === password.value,
+      error: value.length > 0 ? value !== password.value ? "Password & Confirm password should match!" : "" : "Required",
     })
   }
 
@@ -157,16 +166,9 @@ const Login = () => {
                   submitted && !confirmPassword.isValid && <FormControl.ValidationMessage>{confirmPassword.error}</FormControl.ValidationMessage>
                 }
               </FormControl>
-              <FormControl isInvalid={submitted && !age.isValid}>
-                <FormControl.Label htmlFor="age">Confirm You Age</FormControl.Label>
-                <TextInput maxLength={16} type="number" min={1} max={75} onChange={onChangeAge} id="age" />
-                {
-                  submitted && !age.isValid && <FormControl.ValidationMessage>{age.error}</FormControl.ValidationMessage>
-                }
-              </FormControl>
               <Flex justifyContent="center" marginTop="spacingXl">
-                <Button variant="primary" type="submit" isFullWidth isDisabled={isLoading}>
-                  Sign Up {isLoading && <Spinner />}
+                <Button variant={!success ? "primary" : "positive"} type="submit" isFullWidth isDisabled={isLoading || success}>
+                  {!success ? <>Sign Up {isLoading && <Spinner variant="white" />}</> : <>Success <DoneIcon variant="white" /></>}
                 </Button>
               </Flex>
             </Form>

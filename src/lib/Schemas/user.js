@@ -22,11 +22,6 @@ const userSchema = new mongoose.Schema({
     required: true,
     select: false
   },
-  age: {
-    type: Number,
-    required: true,
-    immutable: true
-  },
   lastUpdatedAt: {
     type: Date,
     default: Date.now,
@@ -38,35 +33,35 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-userSchema.pre('save',async function(next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 
-  this.lastUpdatedAt = Math.floor(Date.now() / 1000);
+  this.lastUpdatedAt = new Date();
   next();
 });
 
-userSchema.pre('findOneAndUpdate', function(next) {
-  this.set({ lastUpdatedAt: Math.floor(Date.now() / 1000) });
+userSchema.pre('findOneAndUpdate', function (next) {
+  this.set({ lastUpdatedAt: new Date() });
   next();
 });
 
-userSchema.pre('updateOne', function(next) {
-  this.set({ lastUpdatedAt: Math.floor(Date.now() / 1000) });
+userSchema.pre('updateOne', function (next) {
+  this.set({ lastUpdatedAt: new Date() });
   next();
 });
 
 // Generate JWT token
-userSchema.methods.generateAuthToken = function() {
- const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
- return token;
+userSchema.methods.generateAuthToken = function () {
+  const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  return token;
 };
 
 // Compare password
-userSchema.methods.comparePassword = async function(password) {
+userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 

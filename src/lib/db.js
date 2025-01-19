@@ -4,30 +4,24 @@ let isConnected = false;
 
 mongoose.connection.on('connected', () => {
   isConnected = true;
-  console.log('MongoDB connection is established -------------');
+  console.log('------------- MongoDB connection is established -------------');
 });
 mongoose.connection.on('open', () => {
   isConnected = true;
-  console.log('MongoDB connection is open ----------');
+  console.log('------------- MongoDB connection is open -------------');
 });
 mongoose.connection.on('disconnected', () => {
   isConnected = false;
-  console.log('MongoDB connection is disconnected ----------');
+  console.log('------------- MongoDB connection is disconnected -------------');
 });
 mongoose.connection.on('disconnecting', () => {
   isConnected = false;
-  console.log('MongoDB connection is disconnecting ----------');
+  console.log('------------- MongoDB connection is disconnecting -------------');
 
 });
 mongoose.connection.on('close', () => {
   isConnected = false;
-  console.log('MongoDB connection is closed ----------');
-});
-
-const connection = await mongoose.connect(process.env.NEXT_PUBLIC_MONGODB_CONNECTION_STRING, {
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-  dbName: process.env.DATABASE_NAME,
+  console.log('------------- MongoDB connection is closed -------------');
 });
 
 const connectDB = async () => {
@@ -36,7 +30,7 @@ const connectDB = async () => {
       console.log('MongoDB connection is already active');
       return;
     } else {
-      connection.connect(process.env.NEXT_PUBLIC_MONGODB_CONNECTION_STRING, {
+      await mongoose.connect(process.env.NEXT_PUBLIC_MONGODB_CONNECTION_STRING, {
         useUnifiedTopology: true,
         useNewUrlParser: true,
         dbName: process.env.DATABASE_NAME,

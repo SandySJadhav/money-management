@@ -25,6 +25,7 @@ export async function POST(req) {
     const savedUser = await User.findById(user._id).select('-password');
     delete savedUser.__v;
     return new Response(JSON.stringify({
+      status: 200,
       data: {
         token,
         user: savedUser

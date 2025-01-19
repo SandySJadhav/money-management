@@ -10,29 +10,29 @@ const accountGroupSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  createdAt: {
-    type: Number,
-    default: () => Math.floor(Date.now() / 1000),
-    immutable: true
-  },
   lastUpdatedAt: {
-    type: Number,
-    default: () => Math.floor(Date.now() / 1000)
+    type: Date,
+    default: Date.now,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    immutable: true
+  }
 });
 
-accountGroupSchema.pre('save', function(next) {
-  this.lastUpdatedAt = Math.floor(Date.now() / 1000);
+accountGroupSchema.pre('save', function (next) {
+  this.lastUpdatedAt = new Date()
   next();
 });
 
-accountGroupSchema.pre('findOneAndUpdate', function(next) {
-  this.set({ lastUpdatedAt: Math.floor(Date.now() / 1000) });
+accountGroupSchema.pre('findOneAndUpdate', function (next) {
+  this.set({ lastUpdatedAt: new Date() });
   next();
 });
 
-accountGroupSchema.pre('updateOne', function(next) {
-  this.set({ lastUpdatedAt: Math.floor(Date.now() / 1000) });
+accountGroupSchema.pre('updateOne', function (next) {
+  this.set({ lastUpdatedAt: new Date() });
   next();
 });
 

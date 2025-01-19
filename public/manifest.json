@@ -1,0 +1,12 @@
+{
+  "name": "Money Management App",
+  "short_name": "Money Management App",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "description": "Money Management App helps tracking your budget and monthly expense tracker",
+  "icons": [
+
+  ]
+}

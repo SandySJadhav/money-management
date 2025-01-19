@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Button, Flex, Form, FormControl, Spinner, TextInput } from "@contentful/f36-components";
 import Link from "next/link";
-import { postData } from "@/lib/http.interceptor";
+import { signIn } from "next-auth/react";
 import { DoneIcon } from "@contentful/f36-icons";
 import { useRouter } from "next/navigation";
 
@@ -15,38 +15,43 @@ const Login = () => {
   const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
 
+  const handleLoginResponse = ({ status, error }) => {
+    if (status === 200) {
+      setSuccess(true);
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
+    } else {
+      setSuccess(false);
+      if (error === '401') {
+        setPassword({
+          isValid: false,
+          error: "Wrong password!",
+        });
+      } else if (error === '404') {
+        setUserName({
+          isValid: false,
+          error: "Username does not exist!",
+        });
+      } else {
+        setPassword({
+          isValid: false,
+          error,
+        });
+      }
+    }
+  }
+
   const submitForm = async () => {
     setSubmitted(true);
     setIsLoading(true);
     if (userName.isValid && password.isValid) {
-      const res = await postData("/login", {
+      const res = await signIn("credentials", {
+        redirect: false,
         userName: userName.value,
         password: password.value,
       });
-      if (res.status === 200) {
-        setSuccess(true);
-        setTimeout(() => {
-          router.push("/");
-        }, 1500);
-      } else {
-        setSuccess(false);
-        if (res.status === 401) {
-          setPassword({
-            isValid: false,
-            error: "Wrong password!",
-          });
-        } else if (res.status === 404) {
-          setUserName({
-            isValid: false,
-            error: "Username does not exist!",
-          });
-        } else {
-          setPassword({
-            isValid: false,
-            error: "Internal Server Error!",
-          });
-        }
-      }
+      handleLoginResponse(res);
       setIsLoading(false);
     } else {
       setIsLoading(false);
