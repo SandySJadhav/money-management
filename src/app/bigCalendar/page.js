@@ -4,35 +4,16 @@ import { useEffect, useState } from "react"
 import classNames from "classnames";
 import Modal from "@/components/modal";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/lib/icons";
-
-const MonthList = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
-]
-const WeekList = [
-  "Sun",
-  "Mon",
-  "Tue",
-  "Wed",
-  "Thu",
-  "Fri",
-  "Sat"
-]
+import { MONTH_LIST, WEEK_LIST } from "@/constants";
 
 export default function BigCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [datesInMonth, setDatesInMonth] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+
+  }, []);
 
   useEffect(() => {
     generateCalendar(currentDate);
@@ -57,7 +38,7 @@ export default function BigCalendar() {
     for (let index = firstDayOfMonth; index > 0; index--) {
       currentMonthDates.push({
         date: lastDateOfLastMonth - index + 1,
-        month: MonthList[(month - 1 + 12) % 12],
+        month: MONTH_LIST[(month - 1 + 12) % 12],
         year: month === 0 ? year - 1 : year,
         classes: "text-gray-400"
       });
@@ -69,7 +50,7 @@ export default function BigCalendar() {
     for (let index = 1; index <= lastDateOfMonth; index++) {
       currentMonthDates.push({
         date: index,
-        month: MonthList[month],
+        month: MONTH_LIST[month],
         year,
         classes: dateToday.getFullYear() === year && dateToday.getMonth() === month && dateToday.getDate() === index ? "!bg-blue-400 !text-white" : ""
       });
@@ -79,7 +60,7 @@ export default function BigCalendar() {
     for (let index = 1; currentMonthDates.length < 42; index++) {
       currentMonthDates.push({
         date: index,
-        month: MonthList[(month + 1) % 12],
+        month: MONTH_LIST[(month + 1) % 12],
         year: month === 11 ? year + 1 : year,
         classes: "text-gray-400"
       });
@@ -105,7 +86,7 @@ export default function BigCalendar() {
       <div className="flex items-center justify-between px-6 py-4 border-b dark:border-gray-800">
         <div className="w-44 flex"></div>
         <div className="w-44 flex justify-center">
-          <div className="text-lg font-medium text-gray-900 dark:text-gray-50">{MonthList[currentDate.getMonth()]} {currentDate.getFullYear()}</div>
+          <div className="text-lg font-medium text-gray-900 dark:text-gray-50">{MONTH_LIST[currentDate.getMonth()]} {currentDate.getFullYear()}</div>
         </div>
         <div className="w-44 flex justify-around mr-10">
           <button onClick={handleSetPrevMonth} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 dark:focus-visible:ring-gray-300">
@@ -123,7 +104,7 @@ export default function BigCalendar() {
         <thead>
           <tr className="grid grid-cols-7 gap-1">
             {
-              WeekList.map((weekname) =>
+              WEEK_LIST.map((weekname) =>
                 <th key={weekname} className="text-sm border font-medium text-center text-gray-500 bg-white dark:bg-gray-950 dark:text-gray-400">
                   <div className="p-2 flex justify-center">
                     {weekname}

@@ -6,15 +6,26 @@ import Link from "next/link";
 import { postData } from "@/lib/http.interceptor";
 import { useRouter } from "next/navigation";
 import { DoneIcon } from "@contentful/f36-icons";
+import {
+  ALREADY_HAVING_ACCOUNT,
+  LOGIN,
+  PASSWORD,
+  PASSWORD_CRITERIA,
+  PASSWORD_MISMATCH,
+  REQUIRED,
+  SIGN_UP,
+  SUCCESS,
+  USERNAME
+} from "@/constants";
 
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,12}$/;
 
 const Login = () => {
-  const [userName, setUserName] = useState({ value: "", isValid: false, error: "Required" });
-  const [password, setPassword] = useState({ value: "", isValid: false, error: "Required" });
-  const [confirmPassword, setConfirmPassword] = useState({ value: "", isValid: false, error: "Required" });
-  const [firstName, setFirstName] = useState({ value: "", isValid: false, error: "Required" });
-  const [lastName, setLastName] = useState({ value: "", isValid: false, error: "Required" });
+  const [userName, setUserName] = useState({ value: "", isValid: false, error: REQUIRED });
+  const [password, setPassword] = useState({ value: "", isValid: false, error: REQUIRED });
+  const [confirmPassword, setConfirmPassword] = useState({ value: "", isValid: false, error: REQUIRED });
+  const [firstName, setFirstName] = useState({ value: "", isValid: false, error: REQUIRED });
+  const [lastName, setLastName] = useState({ value: "", isValid: false, error: REQUIRED });
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -72,7 +83,7 @@ const Login = () => {
     setUserName({
       value,
       isValid: value.length > 0,
-      error: value.length > 0 ? "" : "Required",
+      error: value.length > 0 ? "" : REQUIRED,
     });
   }
 
@@ -81,7 +92,7 @@ const Login = () => {
     setFirstName({
       value,
       isValid: value.length > 0,
-      error: value.length > 0 ? "" : "Required",
+      error: value.length > 0 ? "" : REQUIRED,
     });
   }
 
@@ -90,7 +101,7 @@ const Login = () => {
     setLastName({
       value,
       isValid: value.length > 0,
-      error: value.length > 0 ? "" : "Required",
+      error: value.length > 0 ? "" : REQUIRED,
     });
   }
 
@@ -99,13 +110,13 @@ const Login = () => {
     setPassword({
       value,
       isValid: passwordRegex.test(value),
-      error: value.length > 0 ? passwordRegex.test(value) ? "" : "Password must be 4-12 characters long and include at least one letter and one number" : "Required",
+      error: value.length > 0 ? passwordRegex.test(value) ? "" : PASSWORD_CRITERIA : REQUIRED,
     });
     if (confirmPassword.value.length > 0) {
       setConfirmPassword({
         value: confirmPassword.value,
         isValid: value === confirmPassword.value,
-        error: value === confirmPassword.value ? "" : "Password & Confirm password should match!",
+        error: value === confirmPassword.value ? "" : PASSWORD_MISMATCH,
       });
     }
   }
@@ -115,7 +126,7 @@ const Login = () => {
     setConfirmPassword({
       value,
       isValid: value.length > 0 && value === password.value,
-      error: value.length > 0 ? value !== password.value ? "Password & Confirm password should match!" : "" : "Required",
+      error: value.length > 0 ? value !== password.value ? PASSWORD_MISMATCH : "" : REQUIRED,
     })
   }
 
@@ -132,7 +143,7 @@ const Login = () => {
           <div className="flex p-10 flex-col space-6 my-0">
             <Form onSubmit={submitForm}>
               <FormControl isInvalid={submitted && !userName.isValid}>
-                <FormControl.Label htmlFor="userName">Username</FormControl.Label>
+                <FormControl.Label htmlFor="userName">{USERNAME}</FormControl.Label>
                 <TextInput onChange={onChangeUserName} id="userName" />
                 {
                   submitted && !userName.isValid && <FormControl.ValidationMessage>{userName.error}</FormControl.ValidationMessage>
@@ -153,7 +164,7 @@ const Login = () => {
                 }
               </FormControl>
               <FormControl isInvalid={submitted && !password.isValid}>
-                <FormControl.Label htmlFor="password">Password</FormControl.Label>
+                <FormControl.Label htmlFor="password">{PASSWORD}</FormControl.Label>
                 <TextInput maxLength={16} type="password" onChange={onChangePassword} id="password" />
                 {
                   submitted && !password.isValid && <FormControl.ValidationMessage>{password.error}</FormControl.ValidationMessage>
@@ -168,13 +179,13 @@ const Login = () => {
               </FormControl>
               <Flex justifyContent="center" marginTop="spacingXl">
                 <Button variant={!success ? "primary" : "positive"} type="submit" isFullWidth isDisabled={isLoading || success}>
-                  {!success ? <>Sign Up {isLoading && <Spinner variant="white" />}</> : <>Success <DoneIcon variant="white" /></>}
+                  {!success ? <>{SIGN_UP} {isLoading && <Spinner variant="white" />}</> : <>{SUCCESS} <DoneIcon variant="white" /></>}
                 </Button>
               </Flex>
             </Form>
             <hr />
             <div className="">
-              Already have an Account? <Link href="/login">Login</Link>
+              {ALREADY_HAVING_ACCOUNT} <Link href="/login">{LOGIN}</Link>
             </div>
           </div>
         </div>
