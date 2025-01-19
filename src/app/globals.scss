@@ -2,7 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-.fc-theme-standard {
-  width: 100%;
-  height: 100%;
+:root {
+  @apply font-sans;
+
+  a {
+    color: rgb(74, 144, 226);
+    cursor: pointer;
+    border-bottom: 1px dotted rgb(91, 159, 239);
+    text-decoration: none;
+  }
 }

@@ -9,9 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@contentful/f36-components": "^4.77.3",
+    "@contentful/f36-icons": "^4.29.0",
+    "bcryptjs": "^2.4.3",
     "classnames": "^2.5.1",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.4",
-    "next": "14.2.3",
+    "next": "^14.2.23",
     "react": "^18",
     "react-dom": "^18",
     "sass": "^1.77.1"

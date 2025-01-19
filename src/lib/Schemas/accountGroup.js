@@ -36,6 +36,6 @@ accountGroupSchema.pre('updateOne', function(next) {
   next();
 });
 
-const AccountGroup = mongoose.model('AccountGroup', accountGroupSchema);
+const AccountGroup = mongoose.models.AccountGroup || mongoose.model('AccountGroup', accountGroupSchema);
 
 export default AccountGroup;

@@ -30,21 +30,21 @@ const moneySchema = new mongoose.Schema({
   },
 });
 
-moneySchema.pre('save', function(next) {
+moneySchema.pre('save', function (next) {
   this.lastUpdatedAt = Math.floor(Date.now() / 1000);
   next();
 });
 
-moneySchema.pre('findOneAndUpdate', function(next) {
+moneySchema.pre('findOneAndUpdate', function (next) {
   this.set({ lastUpdatedAt: Math.floor(Date.now() / 1000) });
   next();
 });
 
-moneySchema.pre('updateOne', function(next) {
+moneySchema.pre('updateOne', function (next) {
   this.set({ lastUpdatedAt: Math.floor(Date.now() / 1000) });
   next();
 });
 
-const Money = mongoose.model('Money', moneySchema);
+const Money = mongoose.models.Money || mongoose.model('Money', moneySchema);
 
 export default Money;
