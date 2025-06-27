@@ -3,17 +3,14 @@
 import { useEffect, useState } from "react"
 import classNames from "classnames";
 import Modal from "@/components/modal";
-import { ChevronLeftIcon, ChevronRightIcon } from "@/lib/icons";
 import { MONTH_LIST, WEEK_LIST } from "@/constants";
+import { ChevronLeftIcon, ChevronRightIcon } from "@contentful/f36-icons";
+import { Button, IconButton, Tabs } from "@contentful/f36-components";
 
 export default function BigCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [datesInMonth, setDatesInMonth] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-
-  useEffect(() => {
-
-  }, []);
 
   useEffect(() => {
     generateCalendar(currentDate);
@@ -22,18 +19,13 @@ export default function BigCalendar() {
   const generateCalendar = (myDate) => {
     const year = myDate.getFullYear();
     const month = myDate.getMonth();
-
     // get first day of month
     const firstDayOfMonth = new Date(year, month, 1).getDay();
     // get last date of month
     const lastDateOfMonth = new Date(year, month + 1, 0).getDate();
-    // get last day of month
-    const lastDayOfMonth = new Date(year, month, lastDateOfMonth).getDay();
     // get last date of previous month
     const lastDateOfLastMonth = new Date(year, month, 0).getDate();
-
     const currentMonthDates = [];
-
     // capture previous month dates
     for (let index = firstDayOfMonth; index > 0; index--) {
       currentMonthDates.push({
@@ -43,9 +35,7 @@ export default function BigCalendar() {
         classes: "text-gray-400"
       });
     }
-
     const dateToday = new Date();
-
     // capture current month dates
     for (let index = 1; index <= lastDateOfMonth; index++) {
       currentMonthDates.push({
@@ -55,7 +45,6 @@ export default function BigCalendar() {
         classes: dateToday.getFullYear() === year && dateToday.getMonth() === month && dateToday.getDate() === index ? "!bg-blue-400 !text-white" : ""
       });
     }
-
     // capture next month dates
     for (let index = 1; currentMonthDates.length < 42; index++) {
       currentMonthDates.push({
@@ -65,7 +54,6 @@ export default function BigCalendar() {
         classes: "text-gray-400"
       });
     }
-
     setDatesInMonth(currentMonthDates);
   }
 
@@ -89,15 +77,22 @@ export default function BigCalendar() {
           <div className="text-lg font-medium text-gray-900 dark:text-gray-50">{MONTH_LIST[currentDate.getMonth()]} {currentDate.getFullYear()}</div>
         </div>
         <div className="w-44 flex justify-around mr-10">
-          <button onClick={handleSetPrevMonth} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 dark:focus-visible:ring-gray-300">
-            <ChevronLeftIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-          </button>
-          <button className="p-2 hover:bg-gray-100" onClick={() => setCurrentDate(new Date())}>
+          <IconButton
+            type="button"
+            icon={<ChevronLeftIcon className="w-5 h-5" variant="muted" />}
+            onClick={handleSetPrevMonth}
+          />
+          <Button
+            variant="transparent"
+            onClick={() => setCurrentDate(new Date())}
+          >
             Today
-          </button>
-          <button onClick={handleSetNextMonth} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 dark:focus-visible:ring-gray-300">
-            <ChevronRightIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-          </button>
+          </Button>
+          <IconButton
+            type="button"
+            icon={<ChevronRightIcon className="w-5 h-5" variant="muted" />}
+            onClick={handleSetNextMonth}
+          />
         </div>
       </div>
       <table className="h-full">
@@ -139,7 +134,21 @@ export default function BigCalendar() {
       <Modal
         modalOpen={modalOpen}
         onModalClose={() => setModalOpen(false)}
-      />
+      >
+        <Tabs>
+          <Tabs.List>
+            <Tabs.Tab panelId="income">Income</Tabs.Tab>
+            <Tabs.Tab panelId="expense">Expense</Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel id="income">
+            <div className="px-2 py-3">
+              This is contents
+
+            </div>
+          </Tabs.Panel>
+          <Tabs.Panel id="expense"><div className="px-2 py-3">This is second content</div></Tabs.Panel>
+        </Tabs>
+      </Modal>
     </div>
   )
 }

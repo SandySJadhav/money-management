@@ -134,12 +134,11 @@ const Login = () => {
     <>
       <div className="bg-light-gray overflow-auto w-full min-h-screen grid grid-cols-1 place-content-center">
         <div className="text-center mb-12">
-          <h1>Welcome to Money Management</h1>
-          <h4 className="text-light-gray mt-3">
-            Create an Account
-          </h4>
+          <h2 className="text-light-gray mt-3 text-2xl">
+            Create a Money Management Account
+          </h2>
         </div>
-        <div className="border-black rounded-lg bg-white border md:w-[490px] sm:w-full justify-self-center">
+        <div className="border-gray-300 rounded-lg bg-white border md:w-[490px] sm:w-full justify-self-center">
           <div className="flex p-10 flex-col space-6 my-0">
             <Form onSubmit={submitForm}>
               <FormControl isInvalid={submitted && !userName.isValid}>
@@ -184,7 +183,7 @@ const Login = () => {
               </Flex>
             </Form>
             <hr />
-            <div className="">
+            <div className="mt-3">
               {ALREADY_HAVING_ACCOUNT} <Link href="/login">{LOGIN}</Link>
             </div>
           </div>

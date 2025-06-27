@@ -31,8 +31,6 @@ const connectDB = async () => {
       return;
     } else {
       await mongoose.connect(process.env.NEXT_PUBLIC_MONGODB_CONNECTION_STRING, {
-        useUnifiedTopology: true,
-        useNewUrlParser: true,
         dbName: process.env.DATABASE_NAME,
       })
     }

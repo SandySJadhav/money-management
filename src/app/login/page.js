@@ -15,7 +15,6 @@ import {
   SUCCESS,
   USER_DOES_NOT_EXIST,
   USERNAME,
-  WELCOME_BACK,
   WRONG_PASSWORD
 } from "@/constants";
 
@@ -90,12 +89,11 @@ const Login = () => {
     <>
       <div className="bg-light-gray overflow-auto w-full min-h-screen grid grid-cols-1 place-content-center">
         <div className="text-center mb-12">
-          <h1>{WELCOME_BACK}</h1>
-          <h4 className="text-light-gray mt-3">
+          <h2 className="text-light-gray mt-3 text-2xl">
             {LOGIN_TO_MONEY_MANAGEMENT_APP}
-          </h4>
+          </h2>
         </div>
-        <div className="border-black rounded-lg bg-white border md:w-[490px] sm:w-full justify-self-center">
+        <div className="border-gray-300 rounded-lg bg-white border md:w-[490px] sm:w-full justify-self-center">
           <div className="flex p-10 flex-col space-6 my-0">
             <Form onSubmit={submitForm}>
               <FormControl isInvalid={submitted && !userName.isValid}>
@@ -119,7 +117,7 @@ const Login = () => {
               </Flex>
             </Form>
             <hr />
-            <div className="">
+            <div className="mt-3">
               {NEW_USER_SIGNUP_MESSAGE} <Link href="/signup">{SIGN_UP}</Link>
             </div>
           </div>

@@ -25,7 +25,6 @@ export const WEEK_LIST = [
 ];
 
 export const NEW_USER_SIGNUP_MESSAGE = "New to Money Management App?";
-export const WELCOME_BACK = "Welcome back";
 export const LOGIN_TO_MONEY_MANAGEMENT_APP = "Login to your Money Management Account";
 export const ALREADY_HAVING_ACCOUNT = "Already have an Account?";
 export const LOGIN = "Login";

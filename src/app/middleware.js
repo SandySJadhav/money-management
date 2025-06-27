@@ -4,12 +4,12 @@ import connectDB from '@/lib/db';
 import User from '@/lib/Schemas/user';
 
 export async function middleware(req) {
-  await connectDB();
-
   const token = req.headers.get('authorization')?.split(' ')[1];
   if (!token) {
     return NextResponse.json({ error: 'Access denied. No token provided.' }, { status: 401 });
   }
+
+  await connectDB();
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
