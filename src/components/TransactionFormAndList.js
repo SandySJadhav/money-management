@@ -284,7 +284,8 @@ export default function TransactionFormAndList() {
             </div>
           </div>
 
-          <button
+          
+        <button
             type="submit"
             className={`w-full py-3 px-6 text-lg font-medium rounded-md shadow-lg transition-all duration-300 ease-in-out cursor-pointer text-white ${selectedType === 'expense' ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' : 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500'} focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center space-x-2`}
           >

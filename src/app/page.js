@@ -29,31 +29,27 @@ export default function Home() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-8 relative">
         <h1 className="text-4xl font-extrabold text-indigo-700 flex-grow text-center">Money Manager</h1>
         <button
           onClick={() => signOut()}
-          className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-red-600 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer bg-white"
+          className="py-2 right-0 absolute px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-red-600 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer bg-white"
         >
           Sign Out
         </button>
       </div>
 
-      <div className="flex justify-center mb-8">
+      <div className="flex justify-center mb-8 h-[500px]">
         <CustomCalendar
-          onDateClick={setDate}
+          onDateClick={(selectedDate) => {
+            setDate(selectedDate);
+            setShowTransactionModal(true);
+          }}
           value={date}
         />
       </div>
 
-      <div className="text-center">
-        <button
-          onClick={() => setShowTransactionModal(true)}
-          className="py-3 px-6 text-lg font-medium rounded-md shadow-lg transition-all duration-300 ease-in-out cursor-pointer text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center space-x-2 mx-auto"
-        >
-          Add New Transaction
-        </button>
-      </div>
+
 
       {showTransactionModal && (
         <Modal isOpen={showTransactionModal} onClose={() => setShowTransactionModal(false)} title="Manage Transactions">

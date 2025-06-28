@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { FaTimes } from 'react-icons/fa';
 
 export default function Modal({ isOpen, onClose, title, children }) {
   if (!isOpen) return null;
@@ -12,9 +13,9 @@ export default function Modal({ isOpen, onClose, title, children }) {
           <h2 className="text-xl font-bold">{title}</h2>
           <button
             onClick={onClose}
-            className="py-1 px-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
+            className="py-1 px-2 text-sm font-medium text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
           >
-            Close
+            <FaTimes className="hover:text-red-600" />
           </button>
         </div>
         <div>
