@@ -1,65 +1,53 @@
-import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import jwt from "jsonwebtoken";
-import User from "@/lib/Schemas/user";
-import connectDB from "@/lib/db";
+import NextAuth from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { MongooseAdapter } from '@/lib/mongoose-adapter';
+import connectDB from '@/lib/db';
+import User from '@/models/User';
 
-const handler = NextAuth({
+export const authOptions = {
+  adapter: MongooseAdapter(),
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
-        userName: { label: "Username", type: "text" },
-        password: { label: "Password", type: "password" }
+        identifier: { label: 'Email or Username', type: 'text' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         await connectDB();
-        const user = await User.findOne({ userName: credentials.userName }).select('+password');
-        if (!user) {
-          throw new Error('404');
+        const user = await User.findOne({
+          $or: [{ email: credentials.identifier }, { username: credentials.identifier }],
+        });
+
+        if (user && (await user.matchPassword(credentials.password))) {
+          return { id: user._id, name: user.username, email: user.email };
         } else {
-          const isPasswordValid = await user.comparePassword(credentials.password);
-          if (!isPasswordValid) {
-            throw new Error('401');
-          }
+          return null;
         }
-        return { id: user._id, userName: user.userName, firstName: user.firstName, lastName: user.lastName };
-      }
-    })
+      },
+    }),
   ],
   session: {
-    strategy: "jwt"
+    strategy: 'jwt',
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.userName = user.userName;
       }
       return token;
     },
     async session({ session, token }) {
       session.user.id = token.id;
-      session.user.userName = token.userName;
       return session;
-    }
+    },
+  },
+  pages: {
+    signIn: '/login',
   },
   secret: process.env.NEXTAUTH_SECRET,
-  jwt: {
-    secret: process.env.JWT_SECRET,
-    encode: async ({ secret, token }) => {
-      const jwtClaims = {
-        sub: token.id,
-        name: token.userName,
-        iat: Date.now() / 1000,
-        exp: Math.floor(Date.now() / 1000) + 60 * 60
-      };
-      return jwt.sign(jwtClaims, secret, { algorithm: "HS256" });
-    },
-    decode: async ({ secret, token }) => {
-      return jwt.verify(token, secret, { algorithms: ["HS256"] });
-    }
-  }
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

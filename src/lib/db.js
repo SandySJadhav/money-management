@@ -1,41 +1,14 @@
-import mongoose from "mongoose";
-
-let isConnected = false;
-
-mongoose.connection.on('connected', () => {
-  isConnected = true;
-  console.log('------------- MongoDB connection is established -------------');
-});
-mongoose.connection.on('open', () => {
-  isConnected = true;
-  console.log('------------- MongoDB connection is open -------------');
-});
-mongoose.connection.on('disconnected', () => {
-  isConnected = false;
-  console.log('------------- MongoDB connection is disconnected -------------');
-});
-mongoose.connection.on('disconnecting', () => {
-  isConnected = false;
-  console.log('------------- MongoDB connection is disconnecting -------------');
-
-});
-mongoose.connection.on('close', () => {
-  isConnected = false;
-  console.log('------------- MongoDB connection is closed -------------');
-});
+import mongoose from 'mongoose';
 
 const connectDB = async () => {
   try {
-    if (isConnected) {
-      console.log('MongoDB connection is already active');
-      return;
-    } else {
-      await mongoose.connect(process.env.NEXT_PUBLIC_MONGODB_CONNECTION_STRING, {
-        dbName: process.env.DATABASE_NAME,
-      })
-    }
-  } catch (err) {
-    console.error('MongoDB connection error:', err.message);
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('MongoDB connected');
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
     process.exit(1);
   }
 };
