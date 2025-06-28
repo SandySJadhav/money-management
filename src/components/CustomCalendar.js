@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addMonths, subMonths, isSameMonth, isSameDay, addDays, setMonth, setYear, getYear, getMonth, addYears, subYears, isBefore, isAfter } from 'date-fns';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-export default function CustomCalendar({ onDateClick, selectedDate, variant = 'default' }) {
+export default function CustomCalendar({ onDateClick, selectedDate, variant = 'default', transactions = [] }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDateState, setSelectedDateState] = useState(selectedDate || new Date());
   const [showMonthPopup, setShowMonthPopup] = useState(false);
@@ -58,7 +58,7 @@ export default function CustomCalendar({ onDateClick, selectedDate, variant = 'd
     const showNextButton = isBefore(currentMonth, maxDate);
 
     return (
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-4">
         {showPrevButton ? (
           <button onClick={handlePrevMonth} className="px-3 py-2 rounded-md bg-gray-200 hover:bg-gray-300">
             <FaChevronLeft className="text-gray-500" />
@@ -104,12 +104,12 @@ export default function CustomCalendar({ onDateClick, selectedDate, variant = 'd
 
     return (
       <div ref={monthPopupRef} className="absolute z-20 bg-white p-4 rounded-lg shadow-md grid grid-cols-3 gap-2 left-1/2 -translate-x-1/2 mt-2 w-80">
-        <h3 className="text-lg font-semibold col-span-3 text-center mb-2">Select Month</h3>
+        <h3 className="text-lg font-semibold col-span-3 text-center mb-2 border-b border-gray-200 pb-2">Select Month</h3>
         {validMonths.length > 0 ? (
           validMonths.map(month => (
             <div
               key={month}
-              className="p-2 text-center rounded-md cursor-pointer hover:bg-gray-200"
+              className="p-2 text-left rounded-md cursor-pointer hover:bg-gray-200"
               onClick={() => {
                 setCurrentMonth(setMonth(currentMonth, month));
                 setShowMonthPopup(false);
@@ -135,7 +135,7 @@ export default function CustomCalendar({ onDateClick, selectedDate, variant = 'd
           <button onClick={() => setYearPopupStartYear(yearPopupStartYear - 12)} className={`px-2 py-1 rounded-md bg-gray-200 hover:bg-gray-300 ${yearPopupStartYear <= getYear(minDate) ? 'invisible' : ''}`}>
             &lt;
           </button>
-          <h3 className="text-lg font-semibold">Select Year</h3>
+          <h3 className="text-lg font-semibold border-b border-gray-200 pb-2">Select Year</h3>
           <button onClick={() => setYearPopupStartYear(yearPopupStartYear + 12)} className={`px-2 py-1 rounded-md bg-gray-200 hover:bg-gray-300 ${yearPopupStartYear + 11 >= getYear(maxDate) ? 'invisible' : ''}`}>
             &gt;
           </button>
@@ -168,13 +168,13 @@ export default function CustomCalendar({ onDateClick, selectedDate, variant = 'd
     let startDay = startOfWeek(currentMonth);
     for (let i = 0; i < 7; i++) {
       days.push(
-        <div key={i} className="text-center font-medium text-gray-600">
+        <div key={i} className="text-right font-medium text-gray-600">
           {format(startDay, dateFormat)}
         </div>
       );
       startDay = new Date(startDay.setDate(startDay.getDate() + 1));
     }
-    return <div className="grid grid-cols-7 gap-2 mb-2">{days}</div>;
+    return <div className="grid grid-cols-7 gap-2 mb-4">{days}</div>;
   };
 
   const cells = () => {
@@ -195,20 +195,46 @@ export default function CustomCalendar({ onDateClick, selectedDate, variant = 'd
       for (let i = 0; i < 7; i++) {
         formattedDate = format(day, 'd');
         const cloneDay = day;
+
         if (isAfter(cloneDay, maxDate) || isBefore(cloneDay, minDate)) {
           days.push(<div key={cloneDay} className="p-2 text-center rounded-md"></div>);
         } else {
           hasValidDays = true;
+          const dailyIncome = transactions
+            .filter(t => isSameDay(new Date(t.date), cloneDay) && t.type === 'income')
+            .reduce((sum, t) => sum + t.amount, 0);
+
+          const dailyExpense = transactions
+            .filter(t => isSameDay(new Date(t.date), cloneDay) && t.type === 'expense')
+            .reduce((sum, t) => sum + t.amount, 0);
+
+          const incomeRibbon = dailyIncome > 0 ? (
+            <div className="flex items-center text-xs mt-1 px-1 rounded-md bg-green-200 text-green-800">
+              <span className="mr-1">Income:</span>
+              <span>+{dailyIncome.toFixed(2)}</span>
+            </div>
+          ) : null;
+
+          const expenseRibbon = dailyExpense > 0 ? (
+            <div className="flex items-center text-xs mt-1 px-1 rounded-md bg-red-200 text-red-800">
+              <span className="mr-1">Expense:</span>
+              <span>-{dailyExpense.toFixed(2)}</span>
+            </div>
+          ) : null;
+
+          const netRibbon = (dailyIncome > 0 && dailyExpense > 0) ? (
+            <div className="flex items-center text-xs px-1 py-0.5 rounded-md bg-gray-200 text-gray-800 w-full text-left">
+              <span className="mr-1">Net:</span>
+              <span>{(dailyIncome - dailyExpense).toFixed(2)}</span>
+            </div>
+          ) : null;
+
           days.push(
             <div
               key={cloneDay}
-              className={`p-2 text-center rounded-md cursor-pointer flex-grow ${
-                !isSameMonth(cloneDay, currentMonth)
-                  ? 'text-gray-400'
-                  : isSameDay(cloneDay, selectedDateState)
-                    ? 'bg-blue-500 text-white'
-                  : isSameDay(cloneDay, today)
-                    ? 'bg-blue-500 text-white'
+              className={`p-2 rounded-md cursor-pointer flex-grow flex flex-col items-start justify-start relative overflow-hidden ${
+                isSameDay(cloneDay, today)
+                    ? 'bg-gray-200'
                     : 'hover:bg-gray-200'
               }`}
               onClick={() => {
@@ -216,7 +242,12 @@ export default function CustomCalendar({ onDateClick, selectedDate, variant = 'd
                 onDateClick(cloneDay);
               }}
             >
-              <span>{formattedDate}</span>
+              <span className={`absolute top-1 right-1 ${!isSameMonth(cloneDay, currentMonth) ? 'text-base text-gray-400' : 'text-lg'}`}>{formattedDate}</span>
+              <div className="flex flex-col w-full mt-6 space-y-0.5">
+                {incomeRibbon}
+                {expenseRibbon}
+                {netRibbon}
+              </div>
             </div>
           );
         }
@@ -238,7 +269,7 @@ export default function CustomCalendar({ onDateClick, selectedDate, variant = 'd
   };
 
   return (
-    <div className={`bg-white p-4 rounded-lg shadow-md relative flex flex-col ${variant === 'popover' ? 'absolute z-10 mt-1 w-64' : 'w-full h-full mx-auto my-auto max-w-screen-lg'}`}>
+    <div className={`bg-white p-4 rounded-lg shadow-md relative flex flex-col ${variant === 'popover' ? 'absolute z-10 mt-1 w-80' : 'w-full mx-auto h-[700px]'}`}>
       {header()}
       {daysOfWeek()}
       {cells()}
