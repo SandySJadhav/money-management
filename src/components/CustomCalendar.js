@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addMonths, subMonths, isSameMonth, isSameDay, addDays, setMonth, setYear, getYear, getMonth, addYears, subYears, isBefore, isAfter } from 'date-fns';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-export default function CustomCalendar({ onDateClick, selectedDate, variant = 'default', transactions = [] }) {
+export default function CustomCalendar({ onDateClick, selectedDate, variant = 'default', transactions = [], onDailyTransactionsClick }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDateState, setSelectedDateState] = useState(selectedDate || new Date());
   const [showMonthPopup, setShowMonthPopup] = useState(false);
@@ -200,8 +200,9 @@ export default function CustomCalendar({ onDateClick, selectedDate, variant = 'd
           days.push(<div key={cloneDay} className="p-2 text-center rounded-md"></div>);
         } else {
           hasValidDays = true;
-          const dailyIncome = transactions
-            .filter(t => isSameDay(new Date(t.date), cloneDay) && t.type === 'income')
+          const dayTransactions = transactions.filter(t => isSameDay(new Date(t.date), cloneDay));
+          const dailyIncome = dayTransactions
+            .filter(t => t.type === 'income')
             .reduce((sum, t) => sum + t.amount, 0);
 
           const dailyExpense = transactions
@@ -239,7 +240,11 @@ export default function CustomCalendar({ onDateClick, selectedDate, variant = 'd
               }`}
               onClick={() => {
                 setSelectedDateState(cloneDay);
-                onDateClick(cloneDay);
+                if (dailyIncome > 0 || dailyExpense > 0) {
+                  onDailyTransactionsClick(cloneDay, dayTransactions);
+                } else {
+                  onDateClick(cloneDay); // Call original onDateClick if no ribbons
+                }
               }}
             >
               <span className={`absolute top-1 right-1 ${!isSameMonth(cloneDay, currentMonth) ? 'text-base text-gray-400' : 'text-lg'}`}>{formattedDate}</span>

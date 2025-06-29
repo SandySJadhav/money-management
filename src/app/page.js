@@ -8,6 +8,7 @@ import TransactionFormAndList from '@/components/TransactionFormAndList';
 import { FaCalendarAlt, FaListAlt } from 'react-icons/fa';
 import CustomCalendar from '@/components/CustomCalendar'; // Import CustomCalendar
 import MonthlyListView from '@/components/MonthlyListView';
+import DailyTransactionsList from '@/components/DailyTransactionsList';
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -16,6 +17,9 @@ export default function Home() {
   const [date, setDate] = useState(new Date());
   const [transactions, setTransactions] = useState([]);
   const [viewMode, setViewMode] = useState('calendar'); // 'calendar' or 'list'
+  const [showDailyTransactionsModal, setShowDailyTransactionsModal] = useState(false);
+  const [selectedDailyTransactions, setSelectedDailyTransactions] = useState([]);
+  const [selectedDailyDate, setSelectedDailyDate] = useState(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -78,6 +82,11 @@ export default function Home() {
             }}
             value={date}
             transactions={transactions}
+            onDailyTransactionsClick={(date, dailyTransactions) => {
+              setSelectedDailyDate(date);
+              setSelectedDailyTransactions(dailyTransactions);
+              setShowDailyTransactionsModal(true);
+            }}
           />
         </div>
       ) : (
@@ -90,7 +99,17 @@ export default function Home() {
 
       {showTransactionModal && (
         <Modal isOpen={showTransactionModal} onClose={() => setShowTransactionModal(false)} title="Manage Transactions">
-          <TransactionFormAndList />
+          <TransactionFormAndList date={date} />
+        </Modal>
+      )}
+
+      {showDailyTransactionsModal && selectedDailyDate && (
+        <Modal isOpen={showDailyTransactionsModal} onClose={() => setShowDailyTransactionsModal(false)} title={`Transactions for ${selectedDailyDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, ' ').replace('.', '')}`}>
+          <DailyTransactionsList
+            transactions={selectedDailyTransactions}
+            date={selectedDailyDate}
+            onTransactionUpdated={fetchTransactions}
+          />
         </Modal>
       )}
     </div>
